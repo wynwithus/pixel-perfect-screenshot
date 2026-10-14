@@ -74,7 +74,8 @@ function findSigns(text: string, org: Org | null): Sign[] {
       add(new RegExp(host.replace(/\./g, "\\."), "i"), "Suspicious domains", `The link "${host}" asks you to act, and we can't tie it to a known organization.`, false);
     }
   }
-  return signs;
+  const order = ["One-time verification codes","Password requests","Suspicious domains","Shortened links","Gift-card payments","Cryptocurrency payments","Remote-access requests","False urgency"];
+  return signs.sort((a, b) => order.indexOf(a.concept) - order.indexOf(b.concept));
 }
 
 let embedderPromise: Promise<any> | null = null;

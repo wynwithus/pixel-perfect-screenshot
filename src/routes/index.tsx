@@ -54,6 +54,7 @@ function Index() {
   const [result, setResult] = useState<{ a: Analysis; s: SearchResult } | null>(null);
   const search = useServerFn(searchRecentWarnings);
   const clientId = useRef(Math.random().toString(36).slice(2));
+  const [step, setStep] = useState(0);
   const [ocrBusy, setOcrBusy] = useState(false);
   const [ocrMsg, setOcrMsg] = useState("");
 
@@ -96,7 +97,7 @@ function Index() {
       let s: SearchResult;
       try { s = await search({ data: { query: a.query, client: clientId.current } }); }
       catch { s = { status: "unavailable", results: [] }; }
-      setResult({ a, s });
+      setStep(0); setResult({ a, s });
     } catch {
       setError("We couldn't check this message right now. Do not reply or open its links. Try again shortly.");
     } finally { setBusy(false); }
