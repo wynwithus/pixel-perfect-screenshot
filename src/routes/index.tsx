@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { analyze, redact, type Analysis } from "@/lib/analyze";
 import { searchRecentWarnings, type SearchResult } from "@/lib/search.functions";
 import exToll from "@/assets/ex-toll.jpg";
@@ -52,6 +52,7 @@ function Index() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ a: Analysis; s: SearchResult; msg: string } | null>(null);
+  useEffect(() => { if (result) window.scrollTo({ top: 0 }); }, [result]);
   const search = useServerFn(searchRecentWarnings);
   const clientId = useRef(Math.random().toString(36).slice(2));
   const [step, setStep] = useState(0);
@@ -107,7 +108,7 @@ function Index() {
     } finally { setBusy(false); }
   }
 
-  function reset() { setOcrMsg(""); setText(""); setResult(null); setError(""); }
+  function reset() { window.scrollTo({ top: 0 }); setOcrMsg(""); setText(""); setResult(null); setError(""); }
 
   const high = result?.a.risk === "high_concern";
   const match = result?.s.results[0];
@@ -268,7 +269,7 @@ function Index() {
         const s = steps[step] ?? steps[0]!;
         const last = step === steps.length - 1;
         return (
-          <div key={step} ref={(el) => el?.scrollIntoView({ behavior: "smooth", block: "start" })} className="mt-6 scroll-mt-4" aria-live="polite">
+          <div key={step} ref={(el) => { if (step > 0) el?.scrollIntoView({ behavior: "smooth", block: "start" }); }} className="mt-6 scroll-mt-4" aria-live="polite">
             <p className="mb-2 text-base text-muted-foreground">Step {step + 1} of {steps.length}</p>
             {s.title ? <Section title={s.title}>{s.body}</Section> : s.body}
             <div className="mt-4 flex gap-3">
