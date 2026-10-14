@@ -249,7 +249,7 @@ function Index() {
             ),
           },
         ];
-        const s = steps[step];
+        const s = steps[step] ?? steps[0]!;
         const last = step === steps.length - 1;
         return (
           <div className="mt-6" aria-live="polite">
