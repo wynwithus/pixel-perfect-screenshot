@@ -50,6 +50,10 @@ export const searchRecentWarnings = createServerFn({ method: "POST" })
           m.publishedTime ?? m["article:published_time"] ?? m.modifiedTime ?? m["article:modified_time"] ?? m.datePublished ?? m.date;
         const d = raw ? new Date(Array.isArray(raw) ? raw[0] : raw) : null;
         if (!d || isNaN(d.getTime()) || d.getTime() < cutoff || d.getTime() > now + 86400_000) continue;
+        const blob = `${r.title ?? ""} ${r.description ?? ""} ${String(r.markdown ?? "").slice(0, 3000)}`.toLowerCase();
+        if (!/(scam|fraud|phishing|smishing)/.test(blob)) continue;
+        const terms = data.query.toLowerCase().split(/\W+/).filter((w) => w.length > 4 && !/(scam|warning|georgia|text)/.test(w));
+        if (terms.length && !terms.some((t) => blob.includes(t))) continue;
         let url: URL;
         try { url = new URL(r.url ?? m.sourceURL); } catch { continue; }
         if (url.protocol !== "https:") continue;
