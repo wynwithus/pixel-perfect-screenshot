@@ -75,7 +75,7 @@ function Index() {
           const letters = (chars.match(/[a-z]/gi) ?? []).length;
           return letters / chars.length >= 0.6 && /[a-z]{4,}/i.test(l);
         })
-        .join(" ")
+        .join(" ").replace(/\/ (?=\w)/g, "/")
         .slice(0, MAX);
       if (words.length < MIN) { setOcrMsg("We couldn't read enough words. Try a clearer screenshot, or paste the text."); return; }
       setText(words);
