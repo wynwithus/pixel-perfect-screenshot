@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useRef, useState } from "react";
-import { analyze, type Analysis } from "@/lib/analyze";
+import { analyze, redact, type Analysis } from "@/lib/analyze";
 import { searchRecentWarnings, type SearchResult } from "@/lib/search.functions";
 import exToll from "@/assets/ex-toll.jpg";
 import exCode from "@/assets/ex-code.jpg";
@@ -51,7 +51,7 @@ function Index() {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState<{ a: Analysis; s: SearchResult } | null>(null);
+  const [result, setResult] = useState<{ a: Analysis; s: SearchResult; msg: string } | null>(null);
   const search = useServerFn(searchRecentWarnings);
   const clientId = useRef(Math.random().toString(36).slice(2));
   const [step, setStep] = useState(0);
@@ -101,7 +101,7 @@ function Index() {
       let s: SearchResult;
       try { s = await search({ data: { query: a.query, client: clientId.current } }); }
       catch { s = { status: "unavailable", results: [] }; }
-      setStep(0); setResult({ a, s });
+      setStep(0); setResult({ a, s, msg: redact(msg) });
     } catch {
       setError("We couldn't check this message right now. Do not reply or open its links. Try again shortly.");
     } finally { setBusy(false); }
@@ -114,6 +114,16 @@ function Index() {
 
   return (
     <main className="mx-auto w-full max-w-xl px-4 py-8">
+      {result ? (
+        <>
+          <h1 className="text-3xl font-bold leading-tight">Your result</h1>
+          <div className="mt-4 rounded-lg border bg-card p-4">
+            <p className="text-sm font-bold text-muted-foreground">The message you checked</p>
+            <p className="mt-1 max-h-40 overflow-y-auto whitespace-pre-wrap break-words text-base">{result.msg}</p>
+          </div>
+          <button onClick={reset} className="mt-3 w-full rounded-xl border-2 border-input bg-card px-5 py-3 text-base font-bold">Check another message</button>
+        </>
+      ) : (<>
       <h1 className="text-3xl font-bold leading-tight">Does this text look suspicious?</h1>
       <p className="mt-3">Paste the message below. We'll point out warning signs, check for recent scam reports, and show you how to contact the real organization.</p>
       <p className="mt-3 rounded-lg bg-secondary p-3 text-base">Remove passwords, account numbers, verification codes, Social Security numbers, and other private information before continuing.</p>
@@ -128,6 +138,7 @@ function Index() {
           <p><span className="font-bold">How this helps.</span> You get a plain answer before you act, learn one sign to spot next time, and get the real organization's contact. Share this page with a parent, neighbor, or friend who gets these texts.</p>
         </div>
       </details>
+      </>)}
 
       {!result && (
         <div className="mt-6">
