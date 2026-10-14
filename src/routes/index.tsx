@@ -128,7 +128,7 @@ function Index() {
         <div className="mt-6">
           <p className="mb-1 font-bold">Try a real-looking example</p>
           <p className="mb-2 text-base text-muted-foreground">Tap a screenshot. We'll read it just like one you upload.</p>
-          <div className="mb-5 grid grid-cols-3 gap-2">
+          <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex.label}
