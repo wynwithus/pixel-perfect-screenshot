@@ -20,6 +20,12 @@ export const Route = createFileRoute("/")({
 
 const MIN = 20, MAX = 2000;
 
+const EXAMPLES = [
+  { label: "Unpaid toll", text: "Georgia Peach Pass: Your toll account has an unpaid balance of $4.35. Pay today at peachpass-pay.top to avoid a late fee and license suspension." },
+  { label: "Code request", text: "Amazon Security: We noticed a new login to your account. Reply with the 6-digit code we just sent you to keep your account open." },
+  { label: "Appointment reminder", text: "Reminder: You have a dental appointment with Dr. Lee on Thursday at 2pm. Reply C to confirm or R to reschedule." },
+];
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="rounded-xl border bg-card p-5">
@@ -75,6 +81,19 @@ function Index() {
 
       {!result && (
         <div className="mt-6">
+          <p className="mb-2 font-bold">Or try an example</p>
+          <div className="mb-5 grid gap-2 sm:grid-cols-3">
+            {EXAMPLES.map((ex) => (
+              <button
+                key={ex.label}
+                type="button"
+                onClick={() => { setText(ex.text); setError(""); }}
+                className="rounded-lg border-2 border-input bg-card px-3 py-3 text-left text-base font-bold"
+              >
+                {ex.label}
+              </button>
+            ))}
+          </div>
           <label htmlFor="msg" className="mb-2 block font-bold">Paste the text message</label>
           <textarea
             id="msg"
