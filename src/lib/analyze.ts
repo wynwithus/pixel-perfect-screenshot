@@ -118,7 +118,7 @@ export async function analyze(raw: string): Promise<Analysis> {
   const high = signs.some((s) => s.strong);
   const top = signs.slice(0, 3);
 
-  let concept: ConceptName = top[0]?.concept ?? (await pickConcept(text));
+  const concept: ConceptName = top[0] ? top[0].concept : await pickConcept(text);
   const lessonQuote = top.find((s) => s.concept === concept)?.message_quote ?? top[0]?.message_quote ?? text.slice(0, 80);
   const c = CONCEPTS[concept];
 

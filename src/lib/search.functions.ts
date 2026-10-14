@@ -23,7 +23,7 @@ export const searchRecentWarnings = createServerFn({ method: "POST" })
     list.push(now);
     hits.set(data.client, list);
 
-    const key = process.env.FIRECRAWL_API_KEY;
+    const key = process.env['FIRECRAWL_API_KEY'];
     if (!key) return { status: "unavailable", results: [] };
     try {
       const res = await fetch("https://api.firecrawl.dev/v2/search", {
