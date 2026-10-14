@@ -214,7 +214,7 @@ function Index() {
             next: "Learn the trick",
             body: c ? (
               <div className="text-lg">
-                <p>Go to {c.organization}'s real website yourself:</p>
+                <p>Go to {c.organization.split(" (")[0]}'s real website yourself:</p>
                 <p className="mt-2 text-xl"><SafeLink href={c.website}>{c.website.replace("https://", "")}</SafeLink></p>
                 {c.phone && <p className="mt-3">Or call <span className="font-bold">{c.phone}</span></p>}
                 <p className="mt-3 text-base text-muted-foreground">Then forward the text to 7726 and delete it.</p>

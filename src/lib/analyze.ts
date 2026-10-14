@@ -9,7 +9,7 @@ export function redact(text: string) {
     .replace(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g, "[PHONE]")
     .replace(/\b(code|pin|otp|passcode)(\s*(is|:))?\s*\d{4,8}\b/gi, "$1 [CODE]")
     .replace(/\b\d{4,8}\b(?=[^.]*\b(code|verification)\b)/gi, "[CODE]")
-    .replace(/\b(acct|account|acc)(\s*(no\.?|number|#))?\s*[:#]?\s*[A-Z0-9-]{4,}/gi, "$1 [ACCOUNT]")
+    .replace(/\b(acct|account|acc)(\s*(no\.?|number|#))?\s*[:#]?\s*(?=[A-Z-]*\d)[A-Z0-9-]{4,}/gi, "$1 [ACCOUNT]")
     .replace(/\b\d{8,}\b/g, "[ACCOUNT]");
 }
 
