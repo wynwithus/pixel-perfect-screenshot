@@ -65,7 +65,18 @@ function Index() {
       const worker = await createWorker("eng");
       const { data } = await worker.recognize(file);
       await worker.terminate();
-      const words = data.text.replace(/[ \t]+/g, " ").replace(/\n{2,}/g, "\n").trim().slice(0, MAX);
+      // Drop phone chrome (clock, sender number, timestamps, keyboard icons) and OCR noise.
+      const words = data.text
+        .split("\n")
+        .map((l) => l.replace(/[ \t]+/g, " ").trim())
+        .filter((l) => {
+          if (l.length < 8 || /^(today|yesterday|text message|imessage)\b/i.test(l)) return false;
+          const chars = l.replace(/\s/g, "");
+          const letters = (chars.match(/[a-z]/gi) ?? []).length;
+          return letters / chars.length >= 0.6 && /[a-z]{3,}/i.test(l);
+        })
+        .join(" ")
+        .slice(0, MAX);
       if (words.length < MIN) { setOcrMsg("We couldn't read enough words. Try a clearer screenshot, or paste the text."); return; }
       setText(words);
       setOcrMsg("We copied the words below. Check them and remove any private details, then press Check this message.");
