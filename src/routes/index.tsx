@@ -58,8 +58,8 @@ function Index() {
   const [ocrBusy, setOcrBusy] = useState(false);
   const [ocrMsg, setOcrMsg] = useState("");
 
-  async function readImage(file: File) {
-    if (file.size > 10 * 1024 * 1024) { setOcrMsg("That picture is too large. Use one under 10 MB."); return; }
+  async function readImage(file: File): Promise<string | null> {
+    if (file.size > 10 * 1024 * 1024) { setOcrMsg("That picture is too large. Use one under 10 MB."); return null; }
     setOcrBusy(true); setOcrMsg(""); setError("");
     try {
       const { createWorker } = await import("tesseract.js");
@@ -78,22 +78,26 @@ function Index() {
         })
         .join(" ").replace(/\/ (?=\w)/g, "/")
         .slice(0, MAX);
-      if (words.length < MIN) { setOcrMsg("We couldn't read enough words. Try a clearer screenshot, or paste the text."); return; }
+      if (words.length < MIN) { setOcrMsg("We couldn't read enough words. Try a clearer screenshot, or paste the text."); return null; }
       setText(words);
       setOcrMsg("We copied the words below. Check them and remove any private details, then press Check this message.");
+      return words;
     } catch {
       setOcrMsg("We couldn't read that picture. Try another screenshot, or paste the text.");
+      return null;
     } finally { setOcrBusy(false); }
   }
 
   const len = text.trim().length;
   const hint = len === 0 ? "Paste a text message first." : len < MIN ? "Paste at least 20 characters so we have enough to review." : text.length > MAX ? "Shorten the message to 2,000 characters." : "";
 
-  async function run() {
-    if (hint || busy) { setError(hint); return; }
+  async function run(override?: string) {
+    const msg = override ?? text;
+    if (busy) return;
+    if (!override && hint) { setError(hint); return; }
     setBusy(true); setError(""); setResult(null);
     try {
-      const a = await analyze(text);
+      const a = await analyze(msg);
       let s: SearchResult;
       try { s = await search({ data: { query: a.query, client: clientId.current } }); }
       catch { s = { status: "unavailable", results: [] }; }
@@ -137,7 +141,8 @@ function Index() {
                 disabled={ocrBusy}
                 onClick={async () => {
                   const blob = await (await fetch(ex.img)).blob();
-                  readImage(new File([blob], "example.jpg", { type: blob.type }));
+                  const words = await readImage(new File([blob], "example.jpg", { type: blob.type }));
+                  if (words) { setOcrMsg(""); run(words); }
                 }}
                 aria-label={`Try the ${ex.label.toLowerCase()} example`}
                 className="overflow-hidden rounded-2xl border-2 border-input bg-card shadow-sm disabled:opacity-50"
@@ -173,7 +178,7 @@ function Index() {
           <div className={`mt-1 text-right text-sm ${text.length > MAX ? "text-destructive" : "text-muted-foreground"}`}>{text.length} / {MAX}</div>
           {error && <p role="alert" className="mt-2 font-bold text-destructive">{error}</p>}
           <button
-            onClick={run}
+            onClick={() => run()}
             disabled={!!hint || busy}
             className="mt-4 w-full rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground disabled:opacity-50"
           >
