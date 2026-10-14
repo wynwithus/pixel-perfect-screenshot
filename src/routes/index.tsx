@@ -94,6 +94,20 @@ function Index() {
               </button>
             ))}
           </div>
+          <div className="mb-5 rounded-lg border-2 border-dashed border-input bg-card p-4">
+            <label htmlFor="shot" className="block font-bold">Or upload a screenshot of the text</label>
+            <p className="mt-1 text-base text-muted-foreground">We read the words on your device. The picture is not sent anywhere.</p>
+            <input
+              id="shot"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              disabled={ocrBusy}
+              onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) readImage(f); }}
+              className="mt-3 block w-full text-base file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-3 file:font-bold file:text-primary-foreground"
+            />
+            {ocrBusy && <p className="mt-2" aria-live="polite">Reading the words in your picture…</p>}
+            {ocrMsg && <p className="mt-2" aria-live="polite">{ocrMsg}</p>}
+          </div>
           <label htmlFor="msg" className="mb-2 block font-bold">Paste the text message</label>
           <textarea
             id="msg"
