@@ -257,7 +257,7 @@ function Index() {
         const s = steps[step] ?? steps[0]!;
         const last = step === steps.length - 1;
         return (
-          <div className="mt-6" aria-live="polite">
+          <div key={step} ref={(el) => el?.scrollIntoView({ behavior: "smooth", block: "start" })} className="mt-6 scroll-mt-4" aria-live="polite">
             <p className="mb-2 text-base text-muted-foreground">Step {step + 1} of {steps.length}</p>
             {s.title ? <Section title={s.title}>{s.body}</Section> : s.body}
             <div className="mt-4 flex gap-3">
