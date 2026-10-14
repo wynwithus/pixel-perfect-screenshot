@@ -50,6 +50,25 @@ function Index() {
   const [result, setResult] = useState<{ a: Analysis; s: SearchResult } | null>(null);
   const search = useServerFn(searchRecentWarnings);
   const clientId = useRef(Math.random().toString(36).slice(2));
+  const [ocrBusy, setOcrBusy] = useState(false);
+  const [ocrMsg, setOcrMsg] = useState("");
+
+  async function readImage(file: File) {
+    if (file.size > 10 * 1024 * 1024) { setOcrMsg("That picture is too large. Use one under 10 MB."); return; }
+    setOcrBusy(true); setOcrMsg(""); setError("");
+    try {
+      const { createWorker } = await import("tesseract.js");
+      const worker = await createWorker("eng");
+      const { data } = await worker.recognize(file);
+      await worker.terminate();
+      const words = data.text.replace(/[ \t]+/g, " ").replace(/\n{2,}/g, "\n").trim().slice(0, MAX);
+      if (words.length < MIN) { setOcrMsg("We couldn't read enough words. Try a clearer screenshot, or paste the text."); return; }
+      setText(words);
+      setOcrMsg("We copied the words below. Check them and remove any private details, then press Check this message.");
+    } catch {
+      setOcrMsg("We couldn't read that picture. Try another screenshot, or paste the text.");
+    } finally { setOcrBusy(false); }
+  }
 
   const len = text.trim().length;
   const hint = len === 0 ? "Paste a text message first." : len < MIN ? "Paste at least 20 characters so we have enough to review." : text.length > MAX ? "Shorten the message to 2,000 characters." : "";
@@ -68,7 +87,7 @@ function Index() {
     } finally { setBusy(false); }
   }
 
-  function reset() { setText(""); setResult(null); setError(""); }
+  function reset() { setOcrMsg(""); setText(""); setResult(null); setError(""); }
 
   const high = result?.a.risk === "high_concern";
   const match = result?.s.results[0];
