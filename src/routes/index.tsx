@@ -70,10 +70,10 @@ function Index() {
         .split("\n")
         .map((l) => l.replace(/[ \t]+/g, " ").trim())
         .filter((l) => {
-          if (l.length < 8 || /^(today|yesterday|text message|imessage)\b/i.test(l)) return false;
+          if (l.length < 4 || /^(today|yesterday|text message|imessage)\b/i.test(l)) return false;
           const chars = l.replace(/\s/g, "");
           const letters = (chars.match(/[a-z]/gi) ?? []).length;
-          return letters / chars.length >= 0.6 && /[a-z]{3,}/i.test(l);
+          return letters / chars.length >= 0.6 && /[a-z]{4,}/i.test(l);
         })
         .join(" ")
         .slice(0, MAX);
