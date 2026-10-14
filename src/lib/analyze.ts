@@ -61,7 +61,7 @@ function findSigns(text: string, org: Org | null): Sign[] {
   add(/gift\s*card|itunes|google play card/i, "Gift-card payments", "It asks for gift cards. Gift cards are a common way scammers take money.", true);
   add(/bitcoin|crypto|usdt|wallet address/i, "Cryptocurrency payments", "It asks for crypto. That money is very hard to get back.", true);
   add(/anydesk|teamviewer|remote access|download (this|the) app/i, "Remote-access requests", "It asks you to let someone control your device.", true);
-  add(/(today|immediately|within \d+ ?(hours?|hrs?)|final notice|suspend|late fee|penalt|arrest|closed|disconnect|avoid)/i, "False urgency", "It pushes you to act fast. Pressure keeps people from checking first.", /arrest|suspend|penalt|late fee|closed|disconnect/i.test(text));
+  add(/(today|immediately|within \d+ ?(hours?|hrs?)|final notice|suspen|late fee|penalt|arrest|closed|disconnect|avoid|unpaid|overdue)/i, "False urgency", "It rushes you and threatens a penalty. Scammers do this so you act before you check.", /arrest|suspen|penalt|late fee|closed|disconnect|unpaid|overdue|pay (now|today)|\$\d/i.test(text));
 
   const urls = [...text.matchAll(/\b((?:https?:\/\/)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/\S*)?)/gi)].map((m) => m[1]);
   for (const u of urls) {

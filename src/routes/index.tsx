@@ -183,73 +183,90 @@ function Index() {
         </div>
       )}
 
-      {result && (
-        <div className="mt-6 space-y-4" aria-live="polite">
-          <section className={`rounded-xl border-2 p-5 ${high ? "border-destructive bg-danger-soft" : "border-caution bg-caution-soft"}`}>
-            <p className={`text-2xl font-bold ${high ? "text-destructive" : "text-caution"}`}>{high ? "High concern" : "Needs verification"}</p>
-            <p className="mt-2">{result.a.summary}</p>
-          </section>
-
-          {result.a.warning_signs.length > 0 && (
-            <Section title="Why this message raised concern">
-              <ul className="space-y-3">
-                {result.a.warning_signs.map((w, i) => (
-                  <li key={i}>
-                    <blockquote className="break-words border-l-4 border-input pl-3 italic">"{w.message_quote}"</blockquote>
-                    <p className="mt-1">{w.plain_explanation}</p>
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          )}
-
-          <Section title="What to do now">
-            <ol className="list-decimal space-y-2 pl-6">
-              {result.a.actions.map((a, i) => <li key={i}>{a}</li>)}
-            </ol>
-          </Section>
-
-          <Section title="Learn one thing">
-            <p className="font-bold">{result.a.lesson.title}</p>
-            <p className="mt-1">{result.a.lesson.meaning}</p>
-            <p className="mt-2"><span className="font-bold">In your message: </span><span className="break-words italic">"{result.a.lesson.message_example}"</span></p>
-            <p className="mt-2"><span className="font-bold">Habit that protects you: </span>{result.a.lesson.protective_habit}</p>
-          </Section>
-
-          <Section title="Recent warning">
-            {result.s.status === "unavailable" && <p>We could not check recent warnings. Follow the verification steps above.</p>}
-            {result.s.status === "no_recent_match" && <p>We did not find a matching warning from the last 30 days. That does not confirm the message is safe.</p>}
-            {match && (
+      {result && (() => {
+        const a = result.a;
+        const sign = a.warning_signs[0];
+        const c = a.official_contact;
+        const steps: { title: string; body: React.ReactNode; next: string }[] = [
+          {
+            title: "",
+            next: "Why?",
+            body: (
+              <section className={`rounded-xl border-2 p-6 ${high ? "border-destructive bg-danger-soft" : "border-caution bg-caution-soft"}`}>
+                <p className={`text-3xl font-bold ${high ? "text-destructive" : "text-caution"}`}>{high ? "This looks like a scam" : "Treat it as fake for now"}</p>
+                <p className="mt-3 text-lg">{high ? "Don't tap the link, reply, or pay." : "We can't confirm it's real. Don't use its links. Check with the company yourself."}</p>
+              </section>
+            ),
+          },
+          {
+            title: "Why",
+            next: "What do I do?",
+            body: sign ? (
               <div>
+                <blockquote className="break-words border-l-4 border-input pl-3 text-lg italic">"{sign.message_quote}"</blockquote>
+                <p className="mt-3 text-lg">{sign.plain_explanation}</p>
+              </div>
+            ) : <p className="text-lg">It comes from a number you can't check. Real companies can be reached through their own website.</p>,
+          },
+          {
+            title: "Do this",
+            next: "Learn the trick",
+            body: c ? (
+              <div className="text-lg">
+                <p>Go to {c.organization}'s real website yourself:</p>
+                <p className="mt-2 text-xl"><SafeLink href={c.website}>{c.website.replace("https://", "")}</SafeLink></p>
+                {c.phone && <p className="mt-3">Or call <span className="font-bold">{c.phone}</span></p>}
+                <p className="mt-3 text-base text-muted-foreground">Then forward the text to 7726 and delete it.</p>
+              </div>
+            ) : (
+              <p className="text-lg">Call the company using the number on your card, bill, or statement — not the one in the text. Then forward the text to 7726 and delete it.</p>
+            ),
+          },
+          {
+            title: `Learn: ${a.lesson.title}`,
+            next: "Is this happening to others?",
+            body: (
+              <div className="text-lg">
+                <p>{a.lesson.meaning}</p>
+                <p className="mt-3 font-bold">Next time: {a.lesson.protective_habit}</p>
+              </div>
+            ),
+          },
+          {
+            title: "Recent warning",
+            next: "",
+            body: match ? (
+              <div className="text-lg">
                 <p className="font-bold">{match.title}</p>
                 <p className="text-muted-foreground">{match.publisher} · {match.date}</p>
-                {match.excerpt && <p className="mt-2 text-base">{match.excerpt}</p>}
                 <p className="mt-2"><SafeLink href={match.url}>View source</SafeLink></p>
               </div>
-            )}
-          </Section>
-
-          <Section title="Contact the real organization">
-            {result.a.official_contact ? (
-              <dl className="space-y-2">
-                <div><dt className="font-bold">Organization</dt><dd>{result.a.official_contact.organization}</dd></div>
-                <div><dt className="font-bold">Official website</dt><dd><SafeLink href={result.a.official_contact.website}>{result.a.official_contact.website.replace("https://", "")}</SafeLink></dd></div>
-                {result.a.official_contact.contact_page !== result.a.official_contact.website && (
-                  <div><dt className="font-bold">Contact or fraud page</dt><dd><SafeLink href={result.a.official_contact.contact_page}>Open contact page</SafeLink></dd></div>
-                )}
-                {result.a.official_contact.phone && <div><dt className="font-bold">Phone</dt><dd>{result.a.official_contact.phone}</dd></div>}
-              </dl>
+            ) : result.s.status === "unavailable" ? (
+              <p className="text-lg">We could not check recent warnings right now.</p>
             ) : (
-              <p>We couldn't tell which organization this claims to be. Look up its contact details yourself, or use the number printed on your card, bill, or statement.</p>
-            )}
-            <p className="mt-3 text-base">You can also report scams to the FTC at <SafeLink href="https://reportfraud.ftc.gov">reportfraud.ftc.gov</SafeLink>.</p>
-          </Section>
-
-          <button onClick={reset} className="w-full rounded-xl border-2 border-primary bg-card px-5 py-4 text-lg font-bold">
-            Check another message
-          </button>
-        </div>
-      )}
+              <p className="text-lg">We didn't find a matching warning from the last 30 days. That doesn't make the text safe.</p>
+            ),
+          },
+        ];
+        const s = steps[step];
+        const last = step === steps.length - 1;
+        return (
+          <div className="mt-6" aria-live="polite">
+            <p className="mb-2 text-base text-muted-foreground">Step {step + 1} of {steps.length}</p>
+            {s.title ? <Section title={s.title}>{s.body}</Section> : s.body}
+            <div className="mt-4 flex gap-3">
+              {step > 0 && (
+                <button onClick={() => setStep(step - 1)} className="rounded-xl border-2 border-input bg-card px-5 py-4 text-lg font-bold">Back</button>
+              )}
+              {last ? (
+                <button onClick={reset} className="flex-1 rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground">Check another message</button>
+              ) : (
+                <button onClick={() => setStep(step + 1)} className="flex-1 rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground">{s.next}</button>
+              )}
+            </div>
+          </div>
+        );
+      })()}
     </main>
   );
 }
