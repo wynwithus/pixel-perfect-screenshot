@@ -128,7 +128,7 @@ function Index() {
         <div className="mt-6">
           <p className="mb-1 font-bold">Try a real-looking example</p>
           <p className="mb-2 text-base text-muted-foreground">Tap a screenshot. We'll read it just like one you upload.</p>
-          <div className="mb-5 grid grid-cols-3 gap-2">
+          <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex.label}
@@ -138,10 +138,10 @@ function Index() {
                   const blob = await (await fetch(ex.img)).blob();
                   readImage(new File([blob], "example.jpg", { type: blob.type }));
                 }}
-                className="overflow-hidden rounded-lg border-2 border-input bg-card text-left disabled:opacity-50"
+                aria-label={`Try the ${ex.label.toLowerCase()} example`}
+                className="overflow-hidden rounded-2xl border-2 border-input bg-card shadow-sm disabled:opacity-50"
               >
-                <img src={ex.img} alt={`Screenshot of a ${ex.label.toLowerCase()} text`} width={768} height={1024} loading="lazy" className="aspect-[3/4] w-full object-cover object-top" />
-                <span className="block px-2 py-2 text-sm font-bold leading-tight">{ex.label}</span>
+                <img src={ex.img} alt={`Screenshot of a ${ex.label.toLowerCase()} scam text`} width={768} height={1024} loading="lazy" className="aspect-[3/2] w-full object-cover object-top sm:aspect-[3/2.2]" />
               </button>
             ))}
           </div>
