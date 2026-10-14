@@ -81,7 +81,7 @@ function Index() {
         .slice(0, MAX);
       if (words.length < MIN) { setOcrMsg("We couldn't read enough words. Try a clearer screenshot, or paste the text."); return null; }
       setText(words);
-      setOcrMsg("We copied the words below. Check them and remove any private details, then press Check this message.");
+      setOcrMsg("read");
       return words;
     } catch {
       setOcrMsg("We couldn't read that picture. Try another screenshot, or paste the text.");
@@ -108,10 +108,19 @@ function Index() {
     } finally { setBusy(false); }
   }
 
-  function reset() { window.scrollTo({ top: 0 }); setOcrMsg(""); setText(""); setResult(null); setError(""); }
+  function reset() { window.scrollTo({ top: 0 }); setMode("choose"); setOcrMsg(""); setText(""); setResult(null); setError(""); }
 
   const high = result?.a.risk === "high_concern";
   const match = result?.s.results[0];
+
+  const [mode, setMode] = useState<"choose" | "paste" | "upload" | "example">("choose");
+  const back = <button type="button" onClick={() => { setMode("choose"); setOcrMsg(""); setError(""); }} className="mb-4 text-base font-bold text-ring underline underline-offset-2">← Back</button>;
+  const working = (busy || ocrBusy) && (
+    <div className="mt-6 rounded-xl border bg-card p-5 text-center" aria-live="polite">
+      <p className="text-lg font-bold">{ocrBusy ? "Reading the words in the picture…" : "Checking the message…"}</p>
+      <p className="mt-1 text-base text-muted-foreground">The first check can take a moment.</p>
+    </div>
+  );
 
   return (
     <main className="mx-auto w-full max-w-xl px-4 py-8">
@@ -122,84 +131,92 @@ function Index() {
             <p className="text-sm font-bold text-muted-foreground">The message you checked</p>
             <p className="mt-1 max-h-40 overflow-y-auto whitespace-pre-wrap break-words text-base">{result.msg}</p>
           </div>
-          <button onClick={reset} className="mt-3 w-full rounded-xl border-2 border-input bg-card px-5 py-3 text-base font-bold">Check another message</button>
         </>
-      ) : (<>
-      <h1 className="text-3xl font-bold leading-tight">Does this text look suspicious?</h1>
-      <p className="mt-3">Paste the message below. We'll point out warning signs, check for recent scam reports, and show you how to contact the real organization.</p>
-      <p className="mt-3 rounded-lg bg-secondary p-3 text-base">Remove passwords, account numbers, verification codes, Social Security numbers, and other private information before continuing.</p>
-
-      <details className="mt-4 rounded-lg border bg-card p-4">
-        <summary className="cursor-pointer font-bold">Why this matters</summary>
-        <div className="mt-3 space-y-3 text-base">
-          <p><span className="font-bold">The problem.</span> Fake texts pretend to be the post office, a toll agency, a bank, or a store. They push you to tap a link, pay a small fee, or share a code. It only takes one tap to lose money or an account.</p>
-          <p><span className="font-bold">The harm.</span> In 2024, people told the FTC they lost $470 million to scams that started with a text. That is five times more than in 2020, and most scams are never reported.{" "}
-            <a href="https://www.ftc.gov/news-events/news/press-releases/2025/04/new-ftc-data-show-top-text-message-scams-2024-overall-losses-text-scams-hit-470-million" target="_blank" rel="noopener noreferrer" className="font-bold text-ring underline">FTC, April 2025</a></p>
-          <p><span className="font-bold">Who it reaches.</span> Anyone with a phone in Georgia, but it hits hardest for older adults, people new to smartphones, and anyone busy or stressed when the text arrives. Fake delivery problems, fake fraud alerts, and fake unpaid tolls were among the most reported texts.</p>
-          <p><span className="font-bold">How this helps.</span> You get a plain answer before you act, learn one sign to spot next time, and get the real organization's contact. Share this page with a parent, neighbor, or friend who gets these texts.</p>
-        </div>
-      </details>
-      </>)}
-
-      {!result && (
-        <div className="mt-6">
-          <p className="mb-1 font-bold">Try a real-looking example</p>
-          <p className="mb-2 text-base text-muted-foreground">Tap a screenshot. We'll read it just like one you upload.</p>
-          <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {EXAMPLES.map((ex) => (
-              <button
-                key={ex.label}
-                type="button"
-                disabled={ocrBusy}
-                onClick={async () => {
-                  const blob = await (await fetch(ex.img)).blob();
-                  const words = await readImage(new File([blob], "example.jpg", { type: blob.type }));
-                  if (words) { setOcrMsg(""); run(words); }
-                }}
-                aria-label={`Try the ${ex.label.toLowerCase()} example`}
-                className="overflow-hidden rounded-2xl border-2 border-input bg-card shadow-sm disabled:opacity-50"
-              >
-                <img src={ex.img} alt={`Screenshot of a ${ex.label.toLowerCase()} scam text`} width={768} height={1024} loading="lazy" className="aspect-[3/2] w-full object-cover object-top sm:aspect-[3/2.2]" />
+      ) : mode === "choose" ? (
+        <>
+          <h1 className="text-3xl font-bold leading-tight">Got a text that seems off?</h1>
+          <p className="mt-3 text-lg">We'll tell you if it looks like a scam and how to reach the real company.</p>
+          <h2 className="mt-8 mb-3 text-xl font-bold">How do you want to share it?</h2>
+          <div className="space-y-3">
+            {([
+              ["paste", "Paste the words", "Copy the text from your messages."],
+              ["upload", "Upload a screenshot", "We read it on your phone. It isn't sent anywhere."],
+              ["example", "Try an example", "See how it works with a sample scam."],
+            ] as const).map(([m, t, d]) => (
+              <button key={m} type="button" onClick={() => setMode(m)} className="flex w-full items-center justify-between gap-3 rounded-xl border-2 border-input bg-card p-5 text-left shadow-sm">
+                <span className="min-w-0"><span className="block text-lg font-bold">{t}</span><span className="block text-base text-muted-foreground">{d}</span></span>
+                <span aria-hidden className="shrink-0 text-2xl text-muted-foreground">›</span>
               </button>
             ))}
           </div>
-          <div className="mb-5 rounded-lg border-2 border-dashed border-input bg-card p-4">
-            <label htmlFor="shot" className="block font-bold">Or upload a screenshot of the text</label>
-            <p className="mt-1 text-base text-muted-foreground">We read the words on your device. The picture is not sent anywhere.</p>
-            <input
-              id="shot"
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              disabled={ocrBusy}
-              onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) readImage(f); }}
-              className="mt-3 block w-full text-base file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-3 file:font-bold file:text-primary-foreground"
-            />
-            {ocrBusy && <p className="mt-2" aria-live="polite">Reading the words in your picture…</p>}
-            {ocrMsg && <p className="mt-2" aria-live="polite">{ocrMsg}</p>}
-          </div>
-          <label htmlFor="msg" className="mb-2 block font-bold">Paste the text message</label>
-          <textarea
-            id="msg"
-            value={text}
-            maxLength={MAX + 200}
+          <details className="mt-8 rounded-lg border bg-card p-4">
+            <summary className="cursor-pointer font-bold">Why this matters</summary>
+            <div className="mt-3 space-y-3 text-base">
+              <p><span className="font-bold">The problem.</span> Fake texts pretend to be the post office, a toll agency, a bank, or a store. They push you to tap a link, pay a small fee, or share a code. It only takes one tap to lose money or an account.</p>
+              <p><span className="font-bold">The harm.</span> In 2024, people told the FTC they lost $470 million to scams that started with a text. That is five times more than in 2020, and most scams are never reported.{" "}
+                <a href="https://www.ftc.gov/news-events/news/press-releases/2025/04/new-ftc-data-show-top-text-message-scams-2024-overall-losses-text-scams-hit-470-million" target="_blank" rel="noopener noreferrer" className="font-bold text-ring underline">FTC, April 2025</a></p>
+              <p><span className="font-bold">Who it reaches.</span> Anyone with a phone in Georgia, but it hits hardest for older adults, people new to smartphones, and anyone busy or stressed when the text arrives. Fake delivery problems, fake fraud alerts, and fake unpaid tolls were among the most reported texts.</p>
+              <p><span className="font-bold">How this helps.</span> You get a plain answer before you act, learn one sign to spot next time, and get the real organization's contact. Share this page with a parent, neighbor, or friend who gets these texts.</p>
+            </div>
+          </details>
+        </>
+      ) : mode === "example" ? (
+        <>
+          {back}
+          <h1 className="text-3xl font-bold leading-tight">Pick an example</h1>
+          <p className="mt-2 mb-4 text-lg">Tap one. We'll check it right away.</p>
+          {working || (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {EXAMPLES.map((ex) => (
+                <button key={ex.label} type="button"
+                  onClick={async () => {
+                    const blob = await (await fetch(ex.img)).blob();
+                    const words = await readImage(new File([blob], "example.jpg", { type: blob.type }));
+                    if (words) { setOcrMsg(""); run(words); }
+                  }}
+                  aria-label={`Try the ${ex.label.toLowerCase()} example`}
+                  className="overflow-hidden rounded-2xl border-2 border-input bg-card shadow-sm">
+                  <img src={ex.img} alt={`Screenshot of a ${ex.label.toLowerCase()} scam text`} width={768} height={1024} loading="lazy" className="aspect-[3/2] w-full object-cover object-top sm:aspect-[3/2.2]" />
+                </button>
+              ))}
+            </div>
+          )}
+          {ocrMsg && <p role="alert" className="mt-3 font-bold text-destructive">{ocrMsg}</p>}
+        </>
+      ) : mode === "upload" ? (
+        <>
+          {back}
+          <h1 className="text-3xl font-bold leading-tight">Upload a screenshot</h1>
+          <p className="mt-2 mb-4 text-lg">We read the words on your device. The picture is not sent anywhere.</p>
+          {working || (
+            <label htmlFor="shot" className="block w-full cursor-pointer rounded-xl bg-primary px-5 py-4 text-center text-lg font-bold text-primary-foreground">
+              Choose a screenshot
+              <input id="shot" type="file" accept="image/png,image/jpeg,image/webp" className="sr-only"
+                onChange={async (e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f && await readImage(f)) setMode("paste"); }} />
+            </label>
+          )}
+          {ocrMsg && <p role="alert" className="mt-3 font-bold text-destructive">{ocrMsg}</p>}
+        </>
+      ) : (
+        <>
+          {back}
+          <h1 className="text-3xl font-bold leading-tight">{ocrMsg ? "Check the words" : "Paste the text"}</h1>
+          <p className="mt-2 mb-4 text-lg">{ocrMsg ? "Fix anything we read wrong. Remove private details like codes or account numbers." : "Remove private details like codes, passwords, or account numbers."}</p>
+          <label htmlFor="msg" className="sr-only">Text message</label>
+          <textarea id="msg" value={text} maxLength={MAX + 200} disabled={busy}
             onChange={(e) => { setText(e.target.value); setError(""); }}
-            rows={7}
-            placeholder="Example: Your toll account has an unpaid balance. Pay today at…"
-            className="w-full rounded-lg border-2 border-input bg-card p-3 text-base"
-          />
+            rows={7} placeholder="Example: Your toll account has an unpaid balance. Pay today at…"
+            className="w-full rounded-lg border-2 border-input bg-card p-3 text-base" />
           <div className={`mt-1 text-right text-sm ${text.length > MAX ? "text-destructive" : "text-muted-foreground"}`}>{text.length} / {MAX}</div>
           {error && <p role="alert" className="mt-2 font-bold text-destructive">{error}</p>}
-          <button
-            onClick={() => run()}
-            disabled={!!hint || busy}
-            className="mt-4 w-full rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground disabled:opacity-50"
-          >
-            Check this message
-          </button>
-          {busy && <p className="mt-3 text-center" aria-live="polite">Checking the message and looking for recent warnings…</p>}
-          {busy && <p className="mt-1 text-center text-sm text-muted-foreground">The first check loads a small helper into your browser. It can take a moment.</p>}
-        </div>
+          {working || (
+            <button onClick={() => run()} disabled={!!hint} className="mt-4 w-full rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground disabled:opacity-50">
+              Check this message
+            </button>
+          )}
+        </>
       )}
+      {!result && error && mode === "example" && <p role="alert" className="mt-2 font-bold text-destructive">{error}</p>}
 
       {result && (() => {
         const a = result.a;
