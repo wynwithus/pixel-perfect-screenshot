@@ -3,6 +3,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useRef, useState } from "react";
 import { analyze, type Analysis } from "@/lib/analyze";
 import { searchRecentWarnings, type SearchResult } from "@/lib/search.functions";
+import exToll from "@/assets/ex-toll.jpg";
+import exCode from "@/assets/ex-code.jpg";
+import exUsps from "@/assets/ex-usps.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,10 +23,11 @@ export const Route = createFileRoute("/")({
 
 const MIN = 20, MAX = 2000;
 
+// Modeled on the FTC's most-reported text scams of 2024.
 const EXAMPLES = [
-  { label: "Unpaid toll", text: "Georgia Peach Pass: Your toll account has an unpaid balance of $4.35. Pay today at peachpass-pay.top to avoid a late fee and license suspension." },
-  { label: "Code request", text: "Amazon Security: We noticed a new login to your account. Reply with the 6-digit code we just sent you to keep your account open." },
-  { label: "Appointment reminder", text: "Reminder: You have a dental appointment with Dr. Lee on Thursday at 2pm. Reply C to confirm or R to reschedule." },
+  { label: "Package delivery", img: exUsps },
+  { label: "Unpaid toll", img: exToll },
+  { label: "Account code", img: exCode },
 ];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -61,7 +65,18 @@ function Index() {
       const worker = await createWorker("eng");
       const { data } = await worker.recognize(file);
       await worker.terminate();
-      const words = data.text.replace(/[ \t]+/g, " ").replace(/\n{2,}/g, "\n").trim().slice(0, MAX);
+      // Drop phone chrome (clock, sender number, timestamps, keyboard icons) and OCR noise.
+      const words = data.text
+        .split("\n")
+        .map((l) => l.replace(/[ \t]+/g, " ").trim())
+        .filter((l) => {
+          if (l.length < 4 || /^(today|yesterday|text message|imessage)\b/i.test(l)) return false;
+          const chars = l.replace(/\s/g, "");
+          const letters = (chars.match(/[a-z]/gi) ?? []).length;
+          return letters / chars.length >= 0.6 && /[a-z]{4,}/i.test(l);
+        })
+        .join(" ").replace(/\/ (?=\w)/g, "/")
+        .slice(0, MAX);
       if (words.length < MIN) { setOcrMsg("We couldn't read enough words. Try a clearer screenshot, or paste the text."); return; }
       setText(words);
       setOcrMsg("We copied the words below. Check them and remove any private details, then press Check this message.");
@@ -98,18 +113,35 @@ function Index() {
       <p className="mt-3">Paste the message below. We'll point out warning signs, check for recent scam reports, and show you how to contact the real organization.</p>
       <p className="mt-3 rounded-lg bg-secondary p-3 text-base">Remove passwords, account numbers, verification codes, Social Security numbers, and other private information before continuing.</p>
 
+      <details className="mt-4 rounded-lg border bg-card p-4">
+        <summary className="cursor-pointer font-bold">Why this matters</summary>
+        <div className="mt-3 space-y-3 text-base">
+          <p><span className="font-bold">The problem.</span> Fake texts pretend to be the post office, a toll agency, a bank, or a store. They push you to tap a link, pay a small fee, or share a code. It only takes one tap to lose money or an account.</p>
+          <p><span className="font-bold">The harm.</span> In 2024, people told the FTC they lost $470 million to scams that started with a text. That is five times more than in 2020, and most scams are never reported.{" "}
+            <a href="https://www.ftc.gov/news-events/news/press-releases/2025/04/new-ftc-data-show-top-text-message-scams-2024-overall-losses-text-scams-hit-470-million" target="_blank" rel="noopener noreferrer" className="font-bold text-ring underline">FTC, April 2025</a></p>
+          <p><span className="font-bold">Who it reaches.</span> Anyone with a phone in Georgia, but it hits hardest for older adults, people new to smartphones, and anyone busy or stressed when the text arrives. Fake delivery problems, fake fraud alerts, and fake unpaid tolls were among the most reported texts.</p>
+          <p><span className="font-bold">How this helps.</span> You get a plain answer before you act, learn one sign to spot next time, and get the real organization's contact. Share this page with a parent, neighbor, or friend who gets these texts.</p>
+        </div>
+      </details>
+
       {!result && (
         <div className="mt-6">
-          <p className="mb-2 font-bold">Or try an example</p>
-          <div className="mb-5 grid gap-2 sm:grid-cols-3">
+          <p className="mb-1 font-bold">Try a real-looking example</p>
+          <p className="mb-2 text-base text-muted-foreground">Tap a screenshot. We'll read it just like one you upload.</p>
+          <div className="mb-5 grid grid-cols-3 gap-2">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex.label}
                 type="button"
-                onClick={() => { setText(ex.text); setError(""); }}
-                className="rounded-lg border-2 border-input bg-card px-3 py-3 text-left text-base font-bold"
+                disabled={ocrBusy}
+                onClick={async () => {
+                  const blob = await (await fetch(ex.img)).blob();
+                  readImage(new File([blob], "example.jpg", { type: blob.type }));
+                }}
+                className="overflow-hidden rounded-lg border-2 border-input bg-card text-left disabled:opacity-50"
               >
-                {ex.label}
+                <img src={ex.img} alt={`Screenshot of a ${ex.label.toLowerCase()} text`} width={768} height={1024} loading="lazy" className="aspect-[3/4] w-full object-cover object-top" />
+                <span className="block px-2 py-2 text-sm font-bold leading-tight">{ex.label}</span>
               </button>
             ))}
           </div>
