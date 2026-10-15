@@ -154,7 +154,6 @@ function Index() {
           <p className="mt-3 text-lg">We'll tell you if it looks like a scam and how to reach the real company.</p>
           <h2 className="mt-8 mb-1 text-xl font-bold">Tap an example to see how it works</h2>
           <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="grid grid-cols-3 gap-2">
             {EXAMPLES.map((ex) => (
               <button key={ex.label} type="button"
                 onClick={async () => {
