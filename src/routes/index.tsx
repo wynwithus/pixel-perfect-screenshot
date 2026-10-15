@@ -141,11 +141,28 @@ function Index() {
             {([
               ["paste", "Paste the words", "Copy the text from your messages."],
               ["upload", "Upload a screenshot", "We read it on your phone. It isn't sent anywhere."],
-              ["example", "Try an example", "See how it works with a sample scam."],
             ] as const).map(([m, t, d]) => (
               <button key={m} type="button" onClick={() => setMode(m)} className="flex w-full items-center justify-between gap-3 rounded-xl border-2 border-input bg-card p-5 text-left shadow-sm">
                 <span className="min-w-0"><span className="block text-lg font-bold">{t}</span><span className="block text-base text-muted-foreground">{d}</span></span>
                 <span aria-hidden className="shrink-0 text-2xl text-muted-foreground">›</span>
+              </button>
+            ))}
+          </div>
+          <h2 className="mt-8 mb-1 text-xl font-bold">Or try an example</h2>
+          <p className="mb-3 text-base text-muted-foreground">Tap a screenshot to check it.</p>
+          <div className="grid grid-cols-3 gap-2">
+            {EXAMPLES.map((ex) => (
+              <button key={ex.label} type="button"
+                onClick={async () => {
+                  setMode("example");
+                  const blob = await (await fetch(ex.img)).blob();
+                  const words = await readImage(new File([blob], "example.jpg", { type: blob.type }));
+                  if (words) { setOcrMsg(""); run(words); }
+                }}
+                aria-label={`Try the ${ex.label.toLowerCase()} example`}
+                className="overflow-hidden rounded-xl border-2 border-input bg-card shadow-sm">
+                <img src={ex.img} alt="" width={768} height={1024} loading="lazy" className="aspect-[3/4] w-full object-cover object-top" />
+                <span className="block px-1 py-2 text-sm font-bold">{ex.label}</span>
               </button>
             ))}
           </div>
