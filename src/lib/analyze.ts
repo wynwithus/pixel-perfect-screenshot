@@ -135,8 +135,8 @@ export async function analyze(raw: string): Promise<Analysis> {
     ? "Report the text by forwarding it to 7726 (SPAM), then delete it."
     : "If it turns out to be fake, forward it to 7726 (SPAM) and delete it.";
 
-  const phrase = text.replace(/\[[A-Z]+\]|https?:\/\/\S+|\S+\.\w{2,}\/\S*/g, "").split(/[.!?]/).find((s) => s.trim().length > 15)?.trim().split(/\s+/).slice(0, 6).join(" ") ?? "";
-  const query = `${org ? org.name.split(" (")[0] : ""} ${concept === "False urgency" || concept === "Suspicious domains" ? "text" : concept} scam warning ${phrase} Georgia`.replace(/\s+/g, " ").trim();
+
+  const query = `${org ? org.name.split(" (")[0] : ""} ${concept === "False urgency" || concept === "Suspicious domains" ? "text" : concept} scam warning Georgia`.replace(/\s+/g, " ").trim();
 
   return {
     risk: high ? "high_concern" : "needs_verification",
