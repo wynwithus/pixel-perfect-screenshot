@@ -134,6 +134,22 @@ function Index() {
         </>
       ) : mode === "choose" ? (
         <>
+          <header className="mb-8 rounded-xl border bg-card p-4">
+            <p className="text-sm font-bold text-muted-foreground">What scams cost people</p>
+            <dl className="mt-3 grid grid-cols-3 gap-3">
+              {[
+                ["$700", "typical loss to an impersonation scam", "FTC, 2025"],
+                ["$10,400", "typical loss to an investment scam", "FTC, 2025"],
+                ["83%", "of identity-crime victims felt worry or anxiety", "ITRC, 2025"],
+              ].map(([n, l, src]) => (
+                <div key={n} className="min-w-0">
+                  <dt className="text-xl font-bold leading-tight sm:text-2xl">{n}</dt>
+                  <dd className="mt-1 text-sm leading-snug">{l}</dd>
+                  <dd className="mt-1 text-xs text-muted-foreground">{src}</dd>
+                </div>
+              ))}
+            </dl>
+          </header>
           <h1 className="text-3xl font-bold leading-tight">Got a text that seems off?</h1>
           <p className="mt-3 text-lg">We'll tell you if it looks like a scam and how to reach the real company.</p>
           <h2 className="mt-8 mb-3 text-xl font-bold">How do you want to share it?</h2>
