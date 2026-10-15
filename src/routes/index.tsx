@@ -374,7 +374,12 @@ function Index() {
         );
       })()}
       <footer className="mt-10 border-t pt-4 text-sm text-muted-foreground">
-        <p><span className="font-bold text-foreground">Private and free.</span> Your message is checked on your own device by a free, open-source AI model (all-MiniLM-L6-v2). No account, and your text isn't stored. Only a short search with private details removed goes online to look for recent warnings.</p>
+        <p className="font-bold text-foreground">How your message is checked</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5">
+          <li><span className="font-bold text-foreground">On your device.</span> Warning signs are found by fixed rules that run in your browser. Your message and screenshots are not sent or stored.</li>
+          <li><span className="font-bold text-foreground">Open-source AI.</span> When no clear sign is found, a free, open-source model (all-MiniLM-L6-v2) picks the lesson. It downloads once and runs on your device.</li>
+          <li><span className="font-bold text-foreground">One thing goes online.</span> To find recent warnings, we search the web for only the company name and scam type, like "Peach Pass text scam."</li>
+        </ul>
       </footer>
     </main>
     </>
