@@ -263,6 +263,7 @@ function Index() {
         const a = result.a;
         const sign = a.warning_signs[0];
         const c = a.official_contact;
+        const host = result.msg.match(/\b(?:https?:\/\/)?((?:[a-z0-9-]+\.)+[a-z]{2,})(?=[\/\s]|$)/i)?.[1]?.toLowerCase().replace(/^www\./, "");
         const steps: { title: string; body: React.ReactNode; next: string }[] = [
           {
             title: "",
@@ -328,7 +329,11 @@ function Index() {
                   <p className="font-bold">Trusted places to learn more</p>
                   <ul className="mt-2 space-y-2">
                     <li><SafeLink href="https://consumer.ftc.gov/consumer-alerts">FTC scam alerts</SafeLink> — new scams, from the government</li>
-                    <li><SafeLink href="https://www.virustotal.com/gui/home/url">VirusTotal</SafeLink> — checks a link against 70+ security tools. Don't paste links with your name or a code in them; checks are shared publicly.</li>
+                    {host ? (
+                      <li><SafeLink href={`https://www.virustotal.com/gui/domain/${encodeURIComponent(host)}`}>See VirusTotal's report on {host}</SafeLink> — security tools' ratings of this website. We send only the website name, not the full link.</li>
+                    ) : (
+                      <li><SafeLink href="https://www.virustotal.com/gui/home/url">VirusTotal</SafeLink> — checks a link against many security tools.</li>
+                    )}
                     <li><SafeLink href="https://reportfraud.ftc.gov">Report it to the FTC</SafeLink> — helps warn others</li>
                   </ul>
                 </div>
