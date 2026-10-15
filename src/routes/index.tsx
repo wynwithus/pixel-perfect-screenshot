@@ -126,9 +126,9 @@ function Index() {
   return (
     <>
     <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
-      <div className="mx-auto flex max-w-xl items-center justify-between gap-3 px-4 py-2">
+      <div className="mx-auto flex min-h-14 max-w-xl items-center justify-between gap-3 px-4 py-2">
         <span className="flex min-w-0 items-center gap-2 font-bold"><ShieldCheck aria-hidden className="size-5 shrink-0 text-ring" /><span className="truncate">Scam Text Coach</span></span>
-        {(result || mode !== "choose") && (
+        {result && (
           <button type="button" onClick={reset} aria-label="Start a new check" className="flex shrink-0 items-center gap-1.5 rounded-full border-2 border-input bg-card px-3 py-1.5 text-base font-bold text-foreground">
             <RotateCcw aria-hidden className="size-4" /> New check
           </button>
