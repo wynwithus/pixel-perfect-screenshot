@@ -48,6 +48,20 @@ function SafeLink({ href, children }: { href: string; children: React.ReactNode 
   );
 }
 
+function DemoReport() {
+  const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
+  if (state === "sent") return (
+    <p className="rounded-lg bg-secondary p-3"><span className="font-bold">Report sent to the FTC.</span> Thanks for helping warn others. <span className="text-muted-foreground">(Demo — nothing was actually sent.)</span></p>
+  );
+  return (
+    <button type="button" disabled={state === "sending"}
+      onClick={() => { setState("sending"); setTimeout(() => setState("sent"), 1500); }}
+      className="w-full rounded-xl border-2 border-input bg-card px-4 py-3 text-base font-bold disabled:opacity-60">
+      {state === "sending" ? "Sending report…" : "Report it to the FTC (demo)"}
+    </button>
+  );
+}
+
 function Index() {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -328,7 +342,7 @@ function Index() {
                   <p className="font-bold">Trusted places to learn more</p>
                   <ul className="mt-2 space-y-2">
                     <li><SafeLink href="https://consumer.ftc.gov/consumer-alerts">FTC scam alerts</SafeLink> — new scams, from the government</li>
-                    <li><SafeLink href="https://reportfraud.ftc.gov">Report it to the FTC</SafeLink> — helps warn others</li>
+                    <li><DemoReport /></li>
                   </ul>
                 </div>
               </div>
