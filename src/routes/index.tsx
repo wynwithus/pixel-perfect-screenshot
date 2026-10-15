@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
+import { Plus, ShieldCheck } from "lucide-react";
 import { analyze, redact, type Analysis } from "@/lib/analyze";
 import { searchRecentWarnings, type SearchResult } from "@/lib/search.functions";
 import exToll from "@/assets/ex-toll.jpg";
@@ -123,7 +124,16 @@ function Index() {
   );
 
   return (
-    <main className="mx-auto w-full max-w-xl px-4 py-8">
+    <>
+    <div className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
+      <div className="mx-auto flex max-w-xl items-center justify-between gap-3 px-4 py-2">
+        <span className="flex min-w-0 items-center gap-2 font-bold"><ShieldCheck aria-hidden className="size-5 shrink-0 text-ring" /><span className="truncate">Scam Text Coach</span></span>
+        <button type="button" onClick={reset} aria-label="Start a new check" className="flex shrink-0 items-center gap-1 rounded-full bg-primary px-4 py-2 text-base font-bold text-primary-foreground">
+          <Plus aria-hidden className="size-5" /> New
+        </button>
+      </div>
+    </div>
+    <main className="mx-auto w-full max-w-xl px-4 py-6">
       {result ? (
         <>
           <h1 className="text-3xl font-bold leading-tight">Your result</h1>
@@ -335,6 +345,10 @@ function Index() {
           </div>
         );
       })()}
+      <footer className="mt-10 border-t pt-4 text-sm text-muted-foreground">
+        <p><span className="font-bold text-foreground">Private and free.</span> Your message is checked on your own device by a free, open-source AI model (all-MiniLM-L6-v2). No account, and your text isn't stored. Only a short search with private details removed goes online to look for recent warnings.</p>
+      </footer>
     </main>
+    </>
   );
 }
