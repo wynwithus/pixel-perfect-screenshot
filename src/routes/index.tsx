@@ -374,11 +374,11 @@ function Index() {
         );
       })()}
       <footer className="mt-10 border-t pt-4 text-sm text-muted-foreground">
-        <p className="font-bold text-foreground">How your message is checked</p>
+        <p className="font-bold text-foreground">Your privacy</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li><span className="font-bold text-foreground">On your device.</span> Warning signs are found by fixed rules that run in your browser. Your message and screenshots are not sent or stored.</li>
-          <li><span className="font-bold text-foreground">Open-source AI.</span> When no clear sign is found, a free, open-source model (all-MiniLM-L6-v2) picks the lesson. It downloads once and runs on your device.</li>
-          <li><span className="font-bold text-foreground">One thing goes online.</span> To find recent warnings, we search the web for only the company name and scam type, like "Peach Pass text scam."</li>
+          <li><span className="font-bold text-foreground">Stays on your phone.</span> Your message and screenshots are checked right here and never saved or sent.</li>
+          <li><span className="font-bold text-foreground">Free AI.</span> A free, public AI tool helps pick a tip. It runs on your phone too.</li>
+          <li><span className="font-bold text-foreground">Only one thing is looked up.</span> To find recent warnings, we search for just the company name, like "Peach Pass text scam."</li>
         </ul>
       </footer>
     </main>
