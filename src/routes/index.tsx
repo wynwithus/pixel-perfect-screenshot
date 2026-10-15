@@ -311,16 +311,28 @@ function Index() {
           {
             title: "Recent warning",
             next: "",
-            body: match ? (
-              <div className="text-lg">
-                <p className="font-bold">{match.title}</p>
-                <p className="text-muted-foreground">{match.publisher} · {match.date}</p>
-                <p className="mt-2"><SafeLink href={match.url}>View source</SafeLink></p>
+            body: (
+              <div>
+                {match ? (
+                  <div className="text-lg">
+                    <p className="font-bold">{match.title}</p>
+                    <p className="text-muted-foreground">{match.publisher} · {match.date}</p>
+                    <p className="mt-2"><SafeLink href={match.url}>View source</SafeLink></p>
+                  </div>
+                ) : result.s.status === "unavailable" ? (
+                  <p className="text-lg">We could not check recent warnings right now.</p>
+                ) : (
+                  <p className="text-lg">We didn't find a matching warning from the last 30 days. That doesn't make the text safe.</p>
+                )}
+                <div className="mt-5 border-t pt-4 text-base">
+                  <p className="font-bold">Trusted places to learn more</p>
+                  <ul className="mt-2 space-y-2">
+                    <li><SafeLink href="https://consumer.ftc.gov/consumer-alerts">FTC scam alerts</SafeLink> — new scams, from the government</li>
+                    <li><SafeLink href="https://www.virustotal.com/gui/home/url">VirusTotal</SafeLink> — checks a link against 70+ security tools. Don't paste links with your name or a code in them; checks are shared publicly.</li>
+                    <li><SafeLink href="https://reportfraud.ftc.gov">Report it to the FTC</SafeLink> — helps warn others</li>
+                  </ul>
+                </div>
               </div>
-            ) : result.s.status === "unavailable" ? (
-              <p className="text-lg">We could not check recent warnings right now.</p>
-            ) : (
-              <p className="text-lg">We didn't find a matching warning from the last 30 days. That doesn't make the text safe.</p>
             ),
           },
         ];
