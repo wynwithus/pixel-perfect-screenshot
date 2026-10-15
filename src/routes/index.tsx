@@ -152,20 +152,8 @@ function Index() {
           </header>
           <h1 className="text-3xl font-bold leading-tight">Got a text that seems off?</h1>
           <p className="mt-3 text-lg">We'll tell you if it looks like a scam and how to reach the real company.</p>
-          <h2 className="mt-8 mb-3 text-xl font-bold">How do you want to share it?</h2>
-          <div className="space-y-3">
-            {([
-              ["paste", "Paste the words", "Copy the text from your messages."],
-              ["upload", "Upload a screenshot", "We read it on your phone. It isn't sent anywhere."],
-            ] as const).map(([m, t, d]) => (
-              <button key={m} type="button" onClick={() => setMode(m)} className="flex w-full items-center justify-between gap-3 rounded-xl border-2 border-input bg-card p-5 text-left shadow-sm">
-                <span className="min-w-0"><span className="block text-lg font-bold">{t}</span><span className="block text-base text-muted-foreground">{d}</span></span>
-                <span aria-hidden className="shrink-0 text-2xl text-muted-foreground">›</span>
-              </button>
-            ))}
-          </div>
-          <h2 className="mt-8 mb-1 text-xl font-bold">Or try an example</h2>
-          <p className="mb-3 text-base text-muted-foreground">Tap a screenshot to check it.</p>
+          <h2 className="mt-8 mb-1 text-xl font-bold">Tap an example to see how it works</h2>
+          <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="grid grid-cols-3 gap-2">
             {EXAMPLES.map((ex) => (
               <button key={ex.label} type="button"
@@ -182,6 +170,20 @@ function Index() {
               </button>
             ))}
           </div>
+          <details className="mt-6 rounded-xl border-2 border-input bg-card p-4">
+            <summary className="cursor-pointer text-lg font-bold">Check your own text instead</summary>
+            <div className="mt-3 space-y-3">
+            {([
+              ["paste", "Paste the words", "Copy the text from your messages."],
+              ["upload", "Upload a screenshot", "We read it on your phone. It isn't sent anywhere."],
+            ] as const).map(([m, t, d]) => (
+              <button key={m} type="button" onClick={() => setMode(m)} className="flex w-full items-center justify-between gap-3 rounded-xl border-2 border-input bg-card p-5 text-left shadow-sm">
+                <span className="min-w-0"><span className="block text-lg font-bold">{t}</span><span className="block text-base text-muted-foreground">{d}</span></span>
+                <span aria-hidden className="shrink-0 text-2xl text-muted-foreground">›</span>
+              </button>
+            ))}
+            </div>
+          </details>
           <details className="mt-8 rounded-lg border bg-card p-4">
             <summary className="cursor-pointer font-bold">Why this matters</summary>
             <div className="mt-3 space-y-3 text-base">
