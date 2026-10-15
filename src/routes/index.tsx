@@ -134,13 +134,13 @@ function Index() {
         </>
       ) : mode === "choose" ? (
         <>
-          <header className="mb-8 rounded-xl border bg-card p-4">
+          <header className="mb-6 rounded-xl border bg-card p-4">
             <p className="text-sm font-bold text-muted-foreground">What scams cost people</p>
             <dl className="mt-3 grid grid-cols-3 gap-3">
               {[
-                ["$700", "typical loss to an impersonation scam", "FTC, 2025"],
-                ["$10,400", "typical loss to an investment scam", "FTC, 2025"],
-                ["83%", "of identity-crime victims felt worry or anxiety", "ITRC, 2025"],
+                ["$700", "lost to a fake-company scam", "FTC, 2025"],
+                ["$10,400", "lost to an investment scam", "FTC, 2025"],
+                ["83%", "of victims felt anxious", "ITRC, 2025"],
               ].map(([n, l, src]) => (
                 <div key={n} className="min-w-0">
                   <dt className="text-xl font-bold leading-tight sm:text-2xl">{n}</dt>
@@ -151,8 +151,7 @@ function Index() {
             </dl>
           </header>
           <h1 className="text-3xl font-bold leading-tight">Got a text that seems off?</h1>
-          <p className="mt-3 text-lg">We'll tell you if it looks like a scam and how to reach the real company.</p>
-          <h2 className="mt-8 mb-1 text-xl font-bold">Tap an example to see how it works</h2>
+          <h2 className="mt-6 text-xl font-bold">Tap an example to try it</h2>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {EXAMPLES.map((ex) => (
               <button key={ex.label} type="button"
