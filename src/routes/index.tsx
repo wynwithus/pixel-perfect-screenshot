@@ -134,13 +134,13 @@ function Index() {
         </>
       ) : mode === "choose" ? (
         <>
-          <header className="mb-8 rounded-xl border bg-card p-4">
+          <header className="mb-6 rounded-xl border bg-card p-4">
             <p className="text-sm font-bold text-muted-foreground">What scams cost people</p>
             <dl className="mt-3 grid grid-cols-3 gap-3">
               {[
-                ["$700", "typical loss to an impersonation scam", "FTC, 2025"],
-                ["$10,400", "typical loss to an investment scam", "FTC, 2025"],
-                ["83%", "of identity-crime victims felt worry or anxiety", "ITRC, 2025"],
+                ["$700", "lost to a fake-company scam", "FTC, 2025"],
+                ["$10,400", "lost to an investment scam", "FTC, 2025"],
+                ["83%", "of victims felt anxious", "ITRC, 2025"],
               ].map(([n, l, src]) => (
                 <div key={n} className="min-w-0">
                   <dt className="text-xl font-bold leading-tight sm:text-2xl">{n}</dt>
@@ -151,22 +151,8 @@ function Index() {
             </dl>
           </header>
           <h1 className="text-3xl font-bold leading-tight">Got a text that seems off?</h1>
-          <p className="mt-3 text-lg">We'll tell you if it looks like a scam and how to reach the real company.</p>
-          <h2 className="mt-8 mb-3 text-xl font-bold">How do you want to share it?</h2>
-          <div className="space-y-3">
-            {([
-              ["paste", "Paste the words", "Copy the text from your messages."],
-              ["upload", "Upload a screenshot", "We read it on your phone. It isn't sent anywhere."],
-            ] as const).map(([m, t, d]) => (
-              <button key={m} type="button" onClick={() => setMode(m)} className="flex w-full items-center justify-between gap-3 rounded-xl border-2 border-input bg-card p-5 text-left shadow-sm">
-                <span className="min-w-0"><span className="block text-lg font-bold">{t}</span><span className="block text-base text-muted-foreground">{d}</span></span>
-                <span aria-hidden className="shrink-0 text-2xl text-muted-foreground">›</span>
-              </button>
-            ))}
-          </div>
-          <h2 className="mt-8 mb-1 text-xl font-bold">Or try an example</h2>
-          <p className="mb-3 text-base text-muted-foreground">Tap a screenshot to check it.</p>
-          <div className="grid grid-cols-3 gap-2">
+          <h2 className="mt-6 text-xl font-bold">Tap an example to try it</h2>
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {EXAMPLES.map((ex) => (
               <button key={ex.label} type="button"
                 onClick={async () => {
@@ -182,6 +168,20 @@ function Index() {
               </button>
             ))}
           </div>
+          <details className="mt-6 rounded-xl border-2 border-input bg-card p-4">
+            <summary className="cursor-pointer text-lg font-bold">Check your own text instead</summary>
+            <div className="mt-3 space-y-3">
+            {([
+              ["paste", "Paste the words", "Copy the text from your messages."],
+              ["upload", "Upload a screenshot", "We read it on your phone. It isn't sent anywhere."],
+            ] as const).map(([m, t, d]) => (
+              <button key={m} type="button" onClick={() => setMode(m)} className="flex w-full items-center justify-between gap-3 rounded-xl border-2 border-input bg-card p-5 text-left shadow-sm">
+                <span className="min-w-0"><span className="block text-lg font-bold">{t}</span><span className="block text-base text-muted-foreground">{d}</span></span>
+                <span aria-hidden className="shrink-0 text-2xl text-muted-foreground">›</span>
+              </button>
+            ))}
+            </div>
+          </details>
           <details className="mt-8 rounded-lg border bg-card p-4">
             <summary className="cursor-pointer font-bold">Why this matters</summary>
             <div className="mt-3 space-y-3 text-base">
